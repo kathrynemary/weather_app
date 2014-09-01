@@ -4,8 +4,6 @@ require 'yahoo_weatherman'
 def weather(location)
 client = Weatherman::Client.new
 response = client.lookup_by_location(location)
-#temp = "It is " +(((response.condition['temp'])*1.8+32).to_s)+" degrees Fahrenheit!"
-condition = response.condition['text'].to_s
 end
 
 get '/' do
@@ -14,20 +12,15 @@ end
 
 post '/weather' do
 location = params[:post]['location']
-@condition = weather(location)
-if (@location == 'sunny')
+@condition = weather(location).condition['text']
+@degree = (weather(location).condition['temp'])*1.8+32
+if (@condition.downcase == 'sunny' || @condition.downcase == 'clear')
 erb :sunny
-elsif (@location == 'clear')
-erb :sunny
-elsif (@location == 'cloudy')
+elsif (@condition.downcase == 'cloudy' || @condition.downcase == 'mostly cloudy')
 erb :cloudy
-elsif (@location == 'mostly cloudy')
-erb :cloudy
-elsif (@location == 'snowy')
+elsif (@condition.downcase == 'snowy')
 erb :snowy
-elsif (@location == 'rainy')
-erb :rainy
-elsif (@location -- 'light rain')
+elsif (@condition.downcase == 'rainy' || @condition.downcase == 'light rain')
 erb :rainy
 else
 erb :weather
